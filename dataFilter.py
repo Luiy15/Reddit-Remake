@@ -6,11 +6,11 @@ import os
 import time
 
 # PyLucene imports
-from org.apache.lucene.analysis.standard import StandardAnalyzer
-from org.apache.lucene.document import Document, Field, StringField, TextField
-from org.apache.lucene.index import IndexWriter, IndexWriterConfig
-from org.apache.lucene.store import SimpleFSDirectory
-from java.nio.file import Paths
+# from org.apache.lucene.analysis.standard import StandardAnalyzer
+# from org.apache.lucene.document import Document, Field, StringField, TextField
+# from org.apache.lucene.index import IndexWriter, IndexWriterConfig
+# from org.apache.lucene.store import SimpleFSDirectory
+# from java.nio.file import Paths
 
 reddit = praw.Reddit(
     user_agent="MyRedditBot/1.0",  # Customize this string to uniquely identify your application
@@ -89,24 +89,24 @@ def save_to_json(data, filename):
     with open(filename, 'w', encoding='utf-8') as file:
         json.dump(data, file, indent=4)
 
-def build_index(posts, index_dir):
-    analyzer = StandardAnalyzer()
-    config = IndexWriterConfig(analyzer)
-    directory = SimpleFSDirectory(Paths.get(index_dir))
-    writer = IndexWriter(directory, config)
+# def build_index(posts, index_dir):
+#     analyzer = StandardAnalyzer()
+#     config = IndexWriterConfig(analyzer)
+#     directory = SimpleFSDirectory(Paths.get(index_dir))
+#     writer = IndexWriter(directory, config)
     
-    try:
-        for post in posts:
-            doc = Document()
-            doc.add(StringField("title", post['title'], Field.Store.YES))
-            doc.add(StringField("author", post['author'], Field.Store.YES))
-            doc.add(TextField("body", post['title'] + " " + post['linked_page_title'], Field.Store.YES))
-            # Add more fields as needed
+#     try:
+#         for post in posts:
+#             doc = Document()
+#             doc.add(StringField("title", post['title'], Field.Store.YES))
+#             doc.add(StringField("author", post['author'], Field.Store.YES))
+#             doc.add(TextField("body", post['title'] + " " + post['linked_page_title'], Field.Store.YES))
+#             # Add more fields as needed
             
-            writer.addDocument(doc)
+#             writer.addDocument(doc)
             
-    finally:
-        writer.close()
+#     finally:
+#         writer.close()
 
 if __name__ == "__main__":
     # Ensure the Posts directory exists
@@ -130,10 +130,11 @@ if __name__ == "__main__":
         index_directory = f"Index/{subreddit_name}"
         if not os.path.exists(index_directory):
             os.makedirs(index_directory)
-        build_index(posts, index_directory)
+        # build_index(posts, index_directory)
         
-        file_size = FILESIZE_MB(json_filename)
+        # Check file size
+        file_size = os.path.getsize(json_filename) / (1024 * 1024)  # Convert bytes to MB
         if file_size != -1:
-            print(f"The size of {json_filename} is {file_size} MB.")
+            print(f"The size of {json_filename} is {file_size:.2f} MB.")
         else:
             print(f"The file {json_filename} does not exist.")
