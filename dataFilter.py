@@ -5,6 +5,13 @@ from bs4 import BeautifulSoup
 import os
 import time
 
+# PyLucene imports
+from org.apache.lucene.analysis.standard import StandardAnalyzer
+from org.apache.lucene.document import Document, Field, StringField, TextField
+from org.apache.lucene.index import IndexWriter, IndexWriterConfig
+from org.apache.lucene.store import SimpleFSDirectory
+from java.nio.file import Paths
+
 reddit = praw.Reddit(
     user_agent="MyRedditBot/1.0",  # Customize this string to uniquely identify your application
     client_id="xk85F2QCXCOManzrgXdZHQ",
@@ -12,14 +19,6 @@ reddit = praw.Reddit(
     username="lilbillyjoieik",
     password="CS172Project"
 )
-
-def FILESIZE_MB(file_path):
-    if os.path.exists(file_path):
-        file_size_bytes = os.path.getsize(file_path)
-        file_size_mb = file_size_bytes / (1024 * 1024)  # Convert bytes to megabytes
-        return file_size_mb
-    else:
-        return -1
 
 def get_html_title(url):
     try:
@@ -90,6 +89,25 @@ def save_to_json(data, filename):
     with open(filename, 'w', encoding='utf-8') as file:
         json.dump(data, file, indent=4)
 
+def build_index(posts, index_dir):
+    analyzer = StandardAnalyzer()
+    config = IndexWriterConfig(analyzer)
+    directory = SimpleFSDirectory(Paths.get(index_dir))
+    writer = IndexWriter(directory, config)
+    
+    try:
+        for post in posts:
+            doc = Document()
+            doc.add(StringField("title", post['title'], Field.Store.YES))
+            doc.add(StringField("author", post['author'], Field.Store.YES))
+            doc.add(TextField("body", post['title'] + " " + post['linked_page_title'], Field.Store.YES))
+            # Add more fields as needed
+            
+            writer.addDocument(doc)
+            
+    finally:
+        writer.close()
+
 if __name__ == "__main__":
     # Ensure the Posts directory exists
     output_directory = "Posts"
@@ -108,6 +126,12 @@ if __name__ == "__main__":
         json_filename = os.path.join(output_directory, f"{subreddit_name}_reddit_posts.json")
         save_to_json(posts, json_filename)  # Save posts to JSON file
 
+        # Build index
+        index_directory = f"Index/{subreddit_name}"
+        if not os.path.exists(index_directory):
+            os.makedirs(index_directory)
+        build_index(posts, index_directory)
+        
         file_size = FILESIZE_MB(json_filename)
         if file_size != -1:
             print(f"The size of {json_filename} is {file_size} MB.")
