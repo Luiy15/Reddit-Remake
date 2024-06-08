@@ -14,8 +14,9 @@ reddit = praw.Reddit(
     username="lilbillyjoieik",
     password="CS172Project"
 )
-
-def get_subreddit_names(limit=1000, total_subreddits=5000):
+#TOTAL SUBREDDITS SET FOR SAMPLE AND SUBMISSION PURPOSES
+def get_subreddit_names(limit=20, total_subreddits=10): #CHANGE THESE VALUES TO CRAWL REDDIT TO DESIRED SIZE TYPICALL LIMIT IS 1000 and TOTAL SUBREDDITS = 5000 for 500 MB of raw data
+#def get_subreddit_names(limit=1000, total_subreddits=5000):
     subreddit_names = []
     num_collected = 0
     cnt = 0; 
@@ -23,7 +24,7 @@ def get_subreddit_names(limit=1000, total_subreddits=5000):
         batch_size = min(limit, total_subreddits - num_collected)
         for subreddit in reddit.subreddits.popular(limit=batch_size):
             cnt += 1
-            print(f"Grabbing post {cnt}")
+            print(f"Grabbing subreddit {cnt}")
             subreddit_names.append(subreddit.display_name)
             num_collected += 1
             if num_collected >= total_subreddits:
@@ -36,5 +37,6 @@ def write_subreddits_to_file(subreddits, filename):
             file.write(subreddit + '\n')
 
 # Example usage
-subreddit_names = get_subreddit_names(total_subreddits=5000)
+subreddit_names = get_subreddit_names(total_subreddits=10) 
+#subreddit_names = get_subreddit_names(total_subreddits=5000)
 write_subreddits_to_file(subreddit_names, 'subreddit_names.txt')

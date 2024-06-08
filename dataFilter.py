@@ -5,12 +5,15 @@ from bs4 import BeautifulSoup
 import os
 import time
 
-# PyLucene imports
-# from org.apache.lucene.analysis.standard import StandardAnalyzer
-# from org.apache.lucene.document import Document, Field, StringField, TextField
-# from org.apache.lucene.index import IndexWriter, IndexWriterConfig
-# from org.apache.lucene.store import SimpleFSDirectory
-# from java.nio.file import Paths
+import lucene
+from org.apache.lucene.store import SimpleFSDirectory, NIOFSDirectory
+from java.nio.file import Paths
+from org.apache.lucene.analysis.standard import StandardAnalyzer
+from org.apache.lucene.document import Document, Field, FieldType
+from org.apache.lucene.queryparser.classic import QueryParser
+from org.apache.lucene.index import IndexWriter, IndexWriterConfig, IndexOptions, DirectoryReader
+from org.apache.lucene.search import IndexSearcher
+import json
 
 reddit = praw.Reddit(
     user_agent="MyRedditBot/1.0",  # Customize this string to uniquely identify your application
@@ -39,12 +42,12 @@ def collect_all_posts(subreddit_name):
     cnt = 0
     last_post = None
 
-    while True:
+    while len(collected_posts) < 50: # COMMENT THIS LINE OUT IF WANTING TO COLLECT MORE DATA
         try:
             if last_post:
-                posts = subreddit.new(limit=100, params={'after': last_post})
+                posts = subreddit.new(limit=10, params={'after': last_post}) # TYPICAL LIMIT 10
             else:
-                posts = subreddit.new(limit=100)
+                posts = subreddit.new(limit=10) # TYPICAL LIMIT 10 
 
             new_posts = list(posts)
             if not new_posts:
@@ -60,6 +63,7 @@ def collect_all_posts(subreddit_name):
                 post_data = {
                     'title': post.title,
                     'author': post.author.name if post.author else 'Anonymous',
+                    'content': post.selftext,
                     'score': post.score,
                     'url': post.url,
                     'num_comments': post.num_comments,
@@ -89,24 +93,6 @@ def save_to_json(data, filename):
     with open(filename, 'w', encoding='utf-8') as file:
         json.dump(data, file, indent=4)
 
-# def build_index(posts, index_dir):
-#     analyzer = StandardAnalyzer()
-#     config = IndexWriterConfig(analyzer)
-#     directory = SimpleFSDirectory(Paths.get(index_dir))
-#     writer = IndexWriter(directory, config)
-    
-#     try:
-#         for post in posts:
-#             doc = Document()
-#             doc.add(StringField("title", post['title'], Field.Store.YES))
-#             doc.add(StringField("author", post['author'], Field.Store.YES))
-#             doc.add(TextField("body", post['title'] + " " + post['linked_page_title'], Field.Store.YES))
-#             # Add more fields as needed
-            
-#             writer.addDocument(doc)
-            
-#     finally:
-#         writer.close()
 
 if __name__ == "__main__":
     # Ensure the Posts directory exists
@@ -125,12 +111,6 @@ if __name__ == "__main__":
         # Save posts to JSON file within the "Posts" directory
         json_filename = os.path.join(output_directory, f"{subreddit_name}_reddit_posts.json")
         save_to_json(posts, json_filename)  # Save posts to JSON file
-
-        # Build index
-        index_directory = f"Index/{subreddit_name}"
-        if not os.path.exists(index_directory):
-            os.makedirs(index_directory)
-        # build_index(posts, index_directory)
         
         # Check file size
         file_size = os.path.getsize(json_filename) / (1024 * 1024)  # Convert bytes to MB
