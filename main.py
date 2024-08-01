@@ -15,7 +15,7 @@ reddit = praw.Reddit(
     password="CS172Project"
 )
 #TOTAL SUBREDDITS SET FOR SAMPLE AND SUBMISSION PURPOSES
-def get_subreddit_names(limit=20, total_subreddits=10): #CHANGE THESE VALUES TO CRAWL REDDIT TO DESIRED SIZE TYPICALL LIMIT IS 1000 and TOTAL SUBREDDITS = 5000 for 500 MB of raw data
+def get_subreddit_names(limit=1000, total_subreddits=5000): #CHANGE THESE VALUES TO CRAWL REDDIT TO DESIRED SIZE TYPICALL LIMIT IS 1000 and TOTAL SUBREDDITS = 5000 for 500 MB of raw data
 #def get_subreddit_names(limit=1000, total_subreddits=5000):
     subreddit_names = []
     num_collected = 0
@@ -37,6 +37,6 @@ def write_subreddits_to_file(subreddits, filename):
             file.write(subreddit + '\n')
 
 # Example usage
-subreddit_names = get_subreddit_names(total_subreddits=10) 
-#subreddit_names = get_subreddit_names(total_subreddits=5000)
+# subreddit_names = get_subreddit_names(total_subreddits=10) 
+subreddit_names = get_subreddit_names(total_subreddits=5000)
 write_subreddits_to_file(subreddit_names, 'subreddit_names.txt')
