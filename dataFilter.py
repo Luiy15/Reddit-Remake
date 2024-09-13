@@ -17,10 +17,10 @@ import json
 
 reddit = praw.Reddit(
     user_agent="MyRedditBot/1.0",  # Customize this string to uniquely identify your application
-    client_id="xk85F2QCXCOManzrgXdZHQ",
-    client_secret="6oZFMC-Ai67eAXs75RUJm50Q5ObzcQ",
-    username="lilbillyjoieik",
-    password="CS172Project"
+    client_id="",
+    client_secret="",
+    username="",
+    password=""
 )
 
 def get_html_title(url):
