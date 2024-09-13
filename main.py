@@ -9,10 +9,10 @@ from sys import argv
 # Initialize Reddit instance
 reddit = praw.Reddit(
     user_agent="MyRedditBot/1.0",  # Customize this string to uniquely identify your application
-    client_id="xk85F2QCXCOManzrgXdZHQ",
-    client_secret="6oZFMC-Ai67eAXs75RUJm50Q5ObzcQ",
-    username="lilbillyjoieik",
-    password="CS172Project"
+    client_id="",
+    client_secret="",
+    username="",
+    password=""
 )
 #TOTAL SUBREDDITS SET FOR SAMPLE AND SUBMISSION PURPOSES
 def get_subreddit_names(limit=1000, total_subreddits=5000): #CHANGE THESE VALUES TO CRAWL REDDIT TO DESIRED SIZE TYPICALL LIMIT IS 1000 and TOTAL SUBREDDITS = 5000 for 500 MB of raw data
